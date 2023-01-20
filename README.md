@@ -4,6 +4,4 @@ Solution to create a Classification Graph using Cloud  for Internet of Health Ap
 # Setup
 
 
-# Initilizing
-
-## Steps
+# Initilizing steps
