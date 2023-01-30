@@ -103,11 +103,11 @@ def updateGraph():
     
     finalStateList = ['Andar', 'BATER_NA_MESA', 'BATER_PAREDE', 'CORRENDO', 'DEITAR','ESBARRAR_PAREDE', 'ESCREVER', 'PALMAS_EMP', 'PALMAS_SEN', 'PULO','QUEDA_APOIO_FRENTE', 'QUEDA_LATERAL', 'QUEDA_SAPOIO_FRENTE', 'SENTAR', 'SENTAR_APOIO', 'SENTAR_SAPOIO', 'TATEAR']
     preprocessingData = dbp1.executePreproccessing()
-    ANNModelAllSensors = trainModelAllSensors(0.8, 1, 10, preprocessingData)
-    ANNModelOnlyACC = trainModelWithOnlyACC(0.8, 1, 10, preprocessingData)
-    DTModelAllSensors = trainDecisionTreeModelAllSensors(0.7, 10, 100, preprocessingData)
+    ANNModelAllSensors = trainModelAllSensors(0.75, 1, 10, preprocessingData)
+    ANNModelOnlyACC = trainModelWithOnlyACC(0.75, 1, 10, preprocessingData)
+    DTModelAllSensors = trainDecisionTreeModelAllSensors(0.75, 10, 1000, preprocessingData)
     #DTModelOnlyACC = trainDecisionTreeModelWithOnlyACC(0.8, 1, 10, preprocessingData)
-    RFModelAllSensors = trainRandomForestModelAllSensors(0.7, 10, 100, preprocessingData)
+    RFModelAllSensors = trainRandomForestModelAllSensors(0.75, 10, 1000, preprocessingData)
     #RFModelOnlyACC = trainRandomForestModelWithOnlyACC(0.8, 1, 10, preprocessingData)
 
 

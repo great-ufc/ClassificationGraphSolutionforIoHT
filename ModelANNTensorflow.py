@@ -114,6 +114,7 @@ def trainModelAllSensors(threshold, numMin, numMax,preprocessingData):
     model = keras.Sequential([
         keras.layers.Dense(18),  # input layer (1)
         keras.layers.Dense(120, activation='relu'),  # hidden layer (2)
+        keras.layers.Dense(120, activation='relu'),  # hidden layer (2)
         keras.layers.Dense(17, activation='softmax') # output layer (3)
     ])
 
