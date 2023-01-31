@@ -70,7 +70,7 @@ def convertlabelInt(arr):
 
 def executePreproccessing():
     global MyNewDataSetTest, labelTest, MyNewDataSetTrain, labelTrain, MyNewDataSetTest2, labelTest2, MyNewDataSetTrain2, labelTrain2, class_names
-    pathDataset = "Dataset-WatchAlert/Dataset"
+    pathDataset = "Datasets/Dataset1"
 
     #from google.colab import drive
     #drive.mount('/content/drive')
