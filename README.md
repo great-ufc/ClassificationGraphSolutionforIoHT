@@ -15,27 +15,27 @@ To add new Datasets:
 Run the following command to run the flask Web API on server port 3000:
  - flask run --host=0.0.0.0 --port=3000 &
 
-Modify the ServerProcessAPI.py file to read the correct endpoint of your web API (e.g., api_url_base = 'http://localhost:3000')
+Modify the ServerProcessAPI.py file to read the correct endpoint of your web API (e.g., api_url_base = '<_API address_>:3000')
 
 Run "python MainServer.py" to run the server constant process or "python ServerProcessAPI.py" to test the web API
 
 # Endpoints da api
 
 Informs the API that the graph must be updated:
-- <API address>:3000/UpdateGraphRequest/2
+- <_API address_>:3000/UpdateGraphRequest/2
 
 Download the last updated complete graph:
-- <API address>:3000/GraphRequest
+- <_API address_>:3000/GraphRequest
 
 Download the last generated optimized graph:
-- <API address>:3000/OptimizeGraphRequest/download.xml
+- <_API address_>:3000/OptimizeGraphRequest/download.xml
 
 Request for optimization and download of the graph optimized by the application:
-- <API address>:3000/OptimizeGraphRequest/<All types of sensors used by the application separated by an underscore>
+- <_API address_>:3000/OptimizeGraphRequest/<_All types of sensors used by the application separated by an underscore_>
 or
-- <API address>:3000/OptimizeGraphRequest/<All types of sensors used by the application separated by an underscore>/<threshold probability>
+- <_API address_>:3000/OptimizeGraphRequest/<_All types of sensors used by the application separated by an underscore_>/<_Threshold probability_>
 
 Request to download the trained models:
-- <API address>:3000/OptimizeGraphRequest/saved_model/<model name>
+- <_API address_>:3000/OptimizeGraphRequest/saved_model/<_Model Name_>
 
 Note: We suggest downloading the complete graph first to identify which models are trained and the types of sensors it uses. The complete Graph can also guide decision-making in the requirements elicitation and application design phases.
