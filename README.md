@@ -19,7 +19,7 @@ Modify the ServerProcessAPI.py file to read the correct endpoint of your web API
 
 Run "python MainServer.py" to run the server constant process or "python ServerProcessAPI.py" to test the web API
 
-# Endpoints da api
+# Web API endpoinds
 
 Informs the API that the graph must be updated:
 - <_API address_>:3000/UpdateGraphRequest/2
