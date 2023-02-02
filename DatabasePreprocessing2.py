@@ -93,7 +93,7 @@ def extractFeatures(MyNewDataSetTest, labelTest, MyNewDataSetTrain, labelTrain, 
       #Gera vertor de valores unificados para os dados de ACC e Gyr
       infoName = arr[0,4]
       for line in arr:
-          arr_acc_rms = np.vstack([arr_acc_rms,[calc_rms(calc_noise(float(line[0])),calc_noise(float(line[1])),calc_noise(float(line[2]))),line[3],line[4]]])
+          arr_acc_rms = np.vstack([arr_acc_rms,[calc_rms(float(line[0]),float(line[1]),float(line[2])),line[3],line[4]]])
       arr_acc_rms = np.delete(arr_acc_rms, (0), axis=0) #deleta primeira linha vazia
 
       #Vector base for feature extractions
@@ -118,7 +118,7 @@ def extractFeatures(MyNewDataSetTest, labelTest, MyNewDataSetTrain, labelTrain, 
     ##Adiciona os streams no dataset. Uma linha para cada arquivo 
     for file in file_list: ##ler arquivos na pasta
       arr = np.array([[0.0, 0.0, 0.0, "", ""]])
-      movement = str(file_list[0]).split(".")[0][0:len(str(file_list[0])[0])-3].split("-")[7]
+      movement = str(file).split(".")[0][0:len(str(file_list[0])[0])-3].split("-")[7]
       fname = os.path.join(path, file)
       with open(fname, 'r') as f:
         lines = f.readlines()
@@ -126,7 +126,7 @@ def extractFeatures(MyNewDataSetTest, labelTest, MyNewDataSetTrain, labelTrain, 
           #print(len(line.split(':')))
           if(len(line.split(':')) < 2):
             sensor = "ACC"
-            row = [float(line.split(' ')[0]),float(line.split(' ')[1]), float(line.split(' ')[2]), sensor, movement]
+            row = [calc_noise(float(line.split(' ')[0])),calc_noise(float(line.split(' ')[1])), calc_noise(float(line.split(' ')[2])), sensor, movement]
             arr = np.vstack([arr,row])
       arr = np.delete(arr, (0), axis=0) #deleta primeira linha vazia
       MyNewDataSet = np.vstack([MyNewDataSet, feature_extraction_acc(arr)])
