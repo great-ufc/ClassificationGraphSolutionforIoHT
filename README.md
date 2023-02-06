@@ -7,7 +7,7 @@ Download this full repository
 
 To add new Datasets:
  - Add the new Dataset in the Datasets directory
- - Create code for preprocessing following the pattern of DatabasePreprocessing*.py files
+ - Create code for preprocessing following the pattern of Dataset*.py files and Dataset*<sensors>.py files
  - Modify the updateGraph() ServerProcessAPI.py method to use preprocessing data from the added dataset
 
 # Initilizing steps
