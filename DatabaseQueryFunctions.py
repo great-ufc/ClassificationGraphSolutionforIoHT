@@ -133,7 +133,7 @@ def deleteRecord(connection_db, table_name, id_value):
 def updateRecord(connection_db, table_name, value, conditions):
     try:
         if type(list(value.values())[0]) is str:
-            if type(val) is str:
+            if type(list(value.values())[0]) is str:
                 sql = "UPDATE " + table_name + " SET "+ list(value.keys())[0] + " = \""+ list(value.values())[0] + "\" WHERE "
             else:
                 sql = "UPDATE " + table_name + " SET "+ list(value.keys())[0] + " = "+ list(value.values())[0] + " WHERE "
@@ -146,7 +146,10 @@ def updateRecord(connection_db, table_name, value, conditions):
             conditionsSQL = conditionsSQL[0:len(conditionsSQL)-4]
             sql+= conditionsSQL
         else:
-            sql = "UPDATE " + table_name + " SET "+ list(value.keys())[0] + " = "+ list(value.values())[0] + " WHERE "
+            if type(list(value.values())[0]) is str:
+                sql = "UPDATE " + table_name + " SET "+ list(value.keys())[0] + " = "+ list(value.values())[0] + " WHERE "
+            else:
+                sql = "UPDATE " + table_name + " SET "+ list(value.keys())[0] + " = "+ str(list(value.values())[0]) + " WHERE "
             conditionsSQL = ""
             for key, val in conditions.items():
                 if type(val) is str:

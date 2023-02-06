@@ -42,12 +42,18 @@ def addSensorFeatureList(dao,SensorFeatures, verify = False):
 def addMLModelList(dao, MLModels):
     currentMLModels = dao.findAllRecords("MLModel")
     currentMLModelNames = []
+    currentMLModelIDs = []
     mlModelIds = []
     for currentMLModel in currentMLModels:
         currentMLModelNames.append(currentMLModel[2])
     for mLModel in MLModels:
         if not (mLModel.titleModel in currentMLModelNames):
             dao.add("MLModel", mLModel)
+        else:
+            for currentMLModel in currentMLModels:
+                if (mLModel.titleModel == currentMLModel[2]):
+                    dao.update("MLModel", mLModel, currentMLModel[0])
+                    break
         mlModelIds.append(dao.findRecord("MLModel", mLModel)[0][0])
     return mlModelIds
 

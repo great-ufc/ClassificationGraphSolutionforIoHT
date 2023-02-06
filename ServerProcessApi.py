@@ -6,7 +6,7 @@ api_token = 'seu_api_token'
 
 so = platform.system()
 if so == "Windows":
-    api_url_base = 'http://3.86.153.243:3000'#'http://localhost:5000'
+    api_url_base = 'http://localhost:5000'
 if so == "Linux":
     api_url_base = 'http://3.86.153.243:3000'
 
@@ -74,16 +74,19 @@ def updateGraph():
     from addVerticeEdgeLists import addSensorFeatureList, addFeatureMLModel, addMLModelFinalState
     from Entities import Sensor, Feature, MLModel, FinalState, MLAlgorithm
     from XMLCreate import xml_create
-    from ModelANNTensorflow import trainModelAllSensors, trainModelWithOnlyACC
-    from ModelDecisionTreeRandomForestSKLearn import trainDecisionTreeModelAllSensors, trainRandomForestModelAllSensors
+    from ModelANNTensorflow import trainModelWithACCGYR, trainModelWithOnlyACC
+    from ModelDecisionTreeRandomForestSKLearn import trainDecisionTreeModelAccGyr, trainRandomForestModelAccGyr, trainDecisionTreeModelAcc, trainRandomForestModelAcc
     from graphFunctions import addToGraph, getGraphValues, optimizeGraph
-    import DatabasePreprocessing1 as dbp1
+    from Dataset1 import Dataset1
+    from Dataset2 import Dataset2
+    from DatasetACC import DatasetACC
+    from DatasetACC_GYR import DatasetACC_GYR
 
     so = platform.system()
     db = DBInitialize()
     dao = DAO(db.connection_db)
 
-    print("=========Initialize Graph Generate Data from DataBase 1===========")
+    print("=========Initialize Graph Generate Data from Databases===========")
 
     algorithName = ["Artificial Neural Network"]
     modelName = ["ANNModel.tflite"]
@@ -91,9 +94,11 @@ def updateGraph():
     
     algorithName2 = ["Decision Tree"]
     modelName3 = ["sklearn_model_dt.onnx"]
+    modelName4 = ["sklearn_model_dt2.onnx"]
     
     algorithName3 = ["Random Forest"]
     modelName5 = ["sklearn_model_rf.onnx"]
+    modelName6 = ["sklearn_model_rf2.onnx"]
     
     sensorList = [["acc", "accelerometer"], ["gyr","gyroscope"]]
     featureList = ["acc_mean", "acc_max", "acc_min", "acc_std", "acc_kurtosis", "acc_skewness", "acc_entropy", "acc_mad", "acc_iqr","gyr_mean", "gyr_max", "gyr_min", "gyr_std", "gyr_kurtosis", "gyr_skewness", "gyr_entropy", "gyr_mad", "gyr_iqr"]
@@ -101,33 +106,45 @@ def updateGraph():
     sensorList2 = [["acc", "accelerometer"]]
     featureList2 = ["acc_mean", "acc_max", "acc_min", "acc_std", "acc_kurtosis", "acc_skewness", "acc_entropy", "acc_mad", "acc_iqr"]
     
-    finalStateList = ['Andar', 'BATER_NA_MESA', 'BATER_PAREDE', 'CORRENDO', 'DEITAR','ESBARRAR_PAREDE', 'ESCREVER', 'PALMAS_EMP', 'PALMAS_SEN', 'PULO','QUEDA_APOIO_FRENTE', 'QUEDA_LATERAL', 'QUEDA_SAPOIO_FRENTE', 'SENTAR', 'SENTAR_APOIO', 'SENTAR_SAPOIO', 'TATEAR']
-    preprocessingData = dbp1.executePreproccessing()
-    ANNModelAllSensors = trainModelAllSensors(0.75, 1, 10, preprocessingData)
-    ANNModelOnlyACC = trainModelWithOnlyACC(0.75, 1, 10, preprocessingData)
-    DTModelAllSensors = trainDecisionTreeModelAllSensors(0.75, 10, 1000, preprocessingData)
-    #DTModelOnlyACC = trainDecisionTreeModelWithOnlyACC(0.8, 1, 10, preprocessingData)
-    RFModelAllSensors = trainRandomForestModelAllSensors(0.75, 10, 1000, preprocessingData)
-    #RFModelOnlyACC = trainRandomForestModelWithOnlyACC(0.8, 1, 10, preprocessingData)
+    finalStateListACC = ['Walk', 'Hitting on a table', 'Hitting a wall', 'Running', 'Laying', 'Bumping the Wall', 'Writing', 'Clapping Standing', 'Clap Sitting', 'Jump', 'Fall Forward With Support', 'Fall Forward Without Support', 'Fall to the Sides', 'Sitting', 'Sitting With Support', 'Sitting Without Support', 'Grope', 'Brush_teeth', 'Climb_stairs', 'Comb_hair', 'Descend_stairs', 'Drink_glass', 'Eat_meat', 'Eat_soup', 'Getup_bed', 'Liedown_bed', 'Pour_water','Sitdown_chair', 'Standup_chair', 'Use_telephone']
+    
+    finalStateListACCGYR = ['Walk', 'Hitting on a table', 'Hitting a wall', 'Running', 'Laying', 'Bumping the Wall', 'Writing', 'Clapping Standing', 'Clap Sitting', 'Jump', 'Fall Forward With Support', 'Fall Forward Without Support', 'Fall to the Sides', 'Sitting', 'Sitting With Support', 'Sitting Without Support', 'Grope']
+    
+    
+    ###########Preprocessing############
+    dt1 = Dataset1("Datasets/Dataset1")
+    dt2 = Dataset2("Datasets/D2_ADL_Dataset/HMP_Dataset/All_data")
+    dtACC = DatasetACC([dt1,dt2])
+    dtACCGYR = DatasetACC_GYR([dt1])
+    ppDataACC = dtACC.executePreprocessing()
+    ppDataACCGYR = dtACCGYR.executePreprocessing()
+    ###########Trainnig###########
+    print("----Training----")
+    ANNModelACCGYR = trainModelWithACCGYR(0.75, 1, 10, ppDataACCGYR)
+    ANNModelOnlyACC = trainModelWithOnlyACC(0.75, 1, 10, ppDataACC)
+    DTModelAllACCGYR = trainDecisionTreeModelAccGyr(0.75, 10, 1000, ppDataACCGYR)
+    DTModelOnlyACC = trainDecisionTreeModelAcc(0.8, 1, 10, ppDataACC)
+    RFModelAllACCGYR = trainRandomForestModelAccGyr(0.75, 10, 1000, ppDataACCGYR)
+    RFModelOnlyACC = trainRandomForestModelAcc(0.8, 1, 10, ppDataACC)
 
 
     print("=========Generate Graph===========")
     
     #Add Ann Model related Values with All Sensors
-    valuesList = getGraphValues(sensorList, featureList, algorithName, modelName, finalStateList, ANNModelAllSensors)[1]
+    valuesList = getGraphValues(sensorList, featureList, algorithName, modelName, finalStateListACCGYR, ANNModelACCGYR)[1]
     probability = valuesList[1]
     valuesList = valuesList[0]
     addToGraph(dao, valuesList, probability) 
     
     #Add Ann Model related Values with only Accelerometer
-    valuesList2 = getGraphValues(sensorList2, featureList2, algorithName, modelName2, finalStateList, ANNModelOnlyACC)[1]
+    valuesList2 = getGraphValues(sensorList2, featureList2, algorithName, modelName2, finalStateListACC, ANNModelOnlyACC)[1]
     probability2 = valuesList2[1]
     valuesList2 = valuesList2[0]
     addToGraph(dao, valuesList2, probability2)
     
     
     #Add Decision Tree Model related Values with All Sensors
-    valuesList = getGraphValues(sensorList, featureList, algorithName2, modelName3, finalStateList, DTModelAllSensors)[1]
+    valuesList = getGraphValues(sensorList, featureList, algorithName2, modelName3, finalStateListACCGYR, DTModelAllACCGYR)[1]
     probability = valuesList[1]
     valuesList = valuesList[0]
     print(valuesList[1])
@@ -135,14 +152,24 @@ def updateGraph():
     addToGraph(dao, valuesList, probability) 
     
     #Add Decision Tree Model related Values with only Accelerometer
+    valuesList = getGraphValues(sensorList, featureList, algorithName2, modelName4, finalStateListACC, DTModelOnlyACC)[1]
+    probability = valuesList[1]
+    valuesList = valuesList[0]
+    print(valuesList[1])
+    print(valuesList[0])
+    addToGraph(dao, valuesList, probability) 
     
     #Add Random Forest Model related Values with All Sensors
-    valuesList = getGraphValues(sensorList, featureList, algorithName3, modelName5, finalStateList, RFModelAllSensors)[1]
+    valuesList = getGraphValues(sensorList, featureList, algorithName3, modelName5, finalStateListACCGYR, RFModelAllACCGYR)[1]
     probability = valuesList[1]
     valuesList = valuesList[0]
     addToGraph(dao, valuesList, probability) 
     
     #Add Random Forest Model related Values with only Accelerometer
+    valuesList = getGraphValues(sensorList, featureList, algorithName3, modelName6, finalStateListACC, RFModelOnlyACC)[1]
+    probability = valuesList[1]
+    valuesList = valuesList[0]
+    addToGraph(dao, valuesList, probability) 
     
     print("\n=================\n")
 

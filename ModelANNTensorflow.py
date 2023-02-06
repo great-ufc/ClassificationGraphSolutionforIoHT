@@ -11,7 +11,7 @@ def trainModelWithOnlyACC(threshold, numMin, numMax,preprocessingData):
     from pathlib import Path
     
     """**ANN Modeling**"""
-    MyNewDataSetTrain_, MyNewDataSetTest_, labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest, labelTrain2, labelTest2, MyNewDataSetTrain2, MyNewDataSetTest2  = preprocessingData
+    labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest = preprocessingData
     
     ##cria e compila o modelo da rede neural
 
@@ -19,7 +19,7 @@ def trainModelWithOnlyACC(threshold, numMin, numMax,preprocessingData):
         keras.layers.Dense(9),  # input layer (1)
         keras.layers.Dense(120, activation='relu'),  # hidden layer (2)
         keras.layers.Dense(120, activation='relu'),  # hidden layer (2)
-        keras.layers.Dense(17, activation='softmax') # output layer (3)
+        keras.layers.Dense(30, activation='softmax') # output layer (3)
     ])
     
     ##Treina o modelo
@@ -30,19 +30,17 @@ def trainModelWithOnlyACC(threshold, numMin, numMax,preprocessingData):
         model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
-        model.fit(MyNewDataSetTrain2, labelTrain2, epochs=300)  # we pass the data, labels and epochs and watch the magic!
+        model.fit(MyNewDataSetTrain, labelTrain, epochs=300)  # we pass the data, labels and epochs and watch the magic!
 
         ##Avalia o modelo
-        test_loss, test_acc = model.evaluate(MyNewDataSetTest2,  labelTest2, verbose=1)
+        test_loss, test_acc = model.evaluate(MyNewDataSetTest,  labelTest, verbose=1)
         if valueAccuracy < test_acc:
             valueAccuracy = test_acc
             resultModel = model
         cont+=1
     
-    #model.fit(MyNewDataSetTrain2, labelTrain2, epochs=300)  # we pass the data, labels and epochs and watch the magic!
-
     ##Avalia o modelo
-    #test_loss, test_acc = model.evaluate(MyNewDataSetTest2,  labelTest2, verbose=1)
+    #test_loss, test_acc = model.evaluate(MyNewDataSetTest,  labelTest, verbose=1)
 
     print('Test accuracy:', test_acc)
 
@@ -52,15 +50,11 @@ def trainModelWithOnlyACC(threshold, numMin, numMax,preprocessingData):
 
     """**Load Model**"""
 
-    path = os.path.join('saved_model/my_model_')
-    loaded = tf.keras.models.load_model(path)
+    #path = os.path.join('saved_model/my_model_')
+    #loaded = tf.keras.models.load_model(path)
 
-    print(loaded)
 
-    #test
-    test_loss, test_acc = loaded.evaluate(MyNewDataSetTest2, labelTest2, verbose=1) 
-
-    print('Test accuracy:', test_acc)
+    #print('Test accuracy:', test_acc)
 
 
     """**Generate Model Trained File**"""
@@ -93,11 +87,10 @@ def trainModelWithOnlyACC(threshold, numMin, numMax,preprocessingData):
     tflite_model_file = dataset_dir.joinpath("ANNModel2.tflite"+'16')
     tflite_model_file.write_bytes(tflite_model)
     
-    print("SUCCESS2")
     return [resultModel,valueAccuracy]
     
 
-def trainModelAllSensors(threshold, numMin, numMax,preprocessingData):
+def trainModelWithACCGYR(threshold, numMin, numMax,preprocessingData):
     import tensorflow.compat.v2.feature_column as fc
     import tensorflow as tf
     from tensorflow import keras
@@ -107,7 +100,7 @@ def trainModelAllSensors(threshold, numMin, numMax,preprocessingData):
 
     """**ANN Modeling**"""
 
-    MyNewDataSetTrain_, MyNewDataSetTest_, labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest, labelTrain2, labelTest2, MyNewDataSetTrain2, MyNewDataSetTest2  = preprocessingData
+    labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest = preprocessingData
 
     ##cria e compila o modelo da rede neural
 
@@ -141,19 +134,6 @@ def trainModelAllSensors(threshold, numMin, numMax,preprocessingData):
 
     tms_model = resultModel.save('saved_model/my_model')
 
-    """**Load Model**"""
-
-    path = os.path.join('saved_model/my_model')
-    loaded = tf.keras.models.load_model(path)
-
-    print(loaded)
-
-    #test
-    test_loss, test_acc = loaded.evaluate(MyNewDataSetTest, labelTest, verbose=1) 
-
-    print('Test accuracy:', test_acc)
-
-
     """**Generate Model Trained File**"""
           
     ##pip install -q tflite_support
@@ -184,7 +164,6 @@ def trainModelAllSensors(threshold, numMin, numMax,preprocessingData):
     tflite_model_file = dataset_dir.joinpath("ANNModel.tflite"+'16')
     tflite_model_file.write_bytes(tflite_model)
     
-    print("SUCCESS")
     return [resultModel,valueAccuracy]
 
 
@@ -212,8 +191,22 @@ def get_number():
       print("Try again...")
 
 if __name__ == '__main__':
-    #import ANNPreprocessing as pre
-    import DatabasePreprocessing1 as dbp1
+    from Dataset1 import Dataset1
+    from Dataset2 import Dataset2
+    from DatasetACC import DatasetACC
+    from DatasetACC_GYR import DatasetACC_GYR
+    print("====Preprocessing====")
+    dt1 = Dataset1("Datasets/Dataset1")
+    dt2 = Dataset2("Datasets/D2_ADL_Dataset/HMP_Dataset/All_data")
+    dtACC = DatasetACC([dt1,dt2])
+    dtACCGYR = DatasetACC_GYR([dt1])
+    ppDataACC = dtACC.executePreprocessing()
+    ppDataACCGYR = dtACCGYR.executePreprocessing()
+    print("====Training====")
+    modelGenerated2 = trainModelWithOnlyACC(0.7, 1, 10, ppDataACC)
+    modelGenerated = trainModelWithACCGYR(0.7, 1, 10, ppDataACCGYR)
+    
+
     print("=========Initialize Graph Generate Data===========")
     algorithName = ["Artificial Neural Network"]
     modelName = ["ANNModel.tflite"]
@@ -223,29 +216,18 @@ if __name__ == '__main__':
     sensorList2 = [["acc", "accelerometer"]]
     featureList2 = ["acc_mean", "acc_max", "acc_min", "acc_std", "acc_kurtosis", "acc_skewness", "acc_entropy", "acc_mad", "acc_iqr"]
     finalStateList = ['Andar', 'BATER_NA_MESA', 'BATER_PAREDE', 'CORRENDO', 'DEITAR','ESBARRAR_PAREDE', 'ESCREVER', 'PALMAS_EMP', 'PALMAS_SEN', 'PULO','QUEDA_APOIO_FRENTE', 'QUEDA_LATERAL', 'QUEDA_SAPOIO_FRENTE', 'SENTAR', 'SENTAR_APOIO', 'SENTAR_SAPOIO', 'TATEAR']
-    preprocessingData = dbp1.executePreproccessing()
-    #modelGenerated = trainModelAllSensors(0.7, 10, 1000, preprocessingData)
-    modelGenerated2 = trainModelWithOnlyACC(0.8, 1, 10, preprocessingData)
+
 
     print("=========Predict===========")
-
+    labelTrain = ppDataACC[0]
+    labelTest = ppDataACC[1]
+    MyNewDataSetTrain = ppDataACC[2]
+    MyNewDataSetTest = ppDataACC[3]
     
-    '''
-    import platform
-    so = platform.system()
-    if so == "Windows":
-        os.system('cls') or None
-    if so == "Linux":
-        os.system('clear') or None
-    '''
-
-    MyNewDataSetTrain_, MyNewDataSetTest_, labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest, labelTrain2, labelTest2, MyNewDataSetTrain2, MyNewDataSetTest2  = preprocessingData
     while True:
         num = get_number()
         if num > 37:
             break 
-        #classes = MyNewDataSetTest[num]
-        #label = labelTest[num]
-        classes = MyNewDataSetTest2[num]
-        label = labelTest2[num]
+        classes = MyNewDataSetTest[num]
+        label = labelTest[num]
         predict(modelGenerated2[0], classes, label)

@@ -24,11 +24,10 @@ import platform
 #####################################################################################################################
 
 
-def trainDecisionTreeModelAllSensors(threshold, testMin, testMax, preprocessingData):
+def trainDecisionTreeModelAccGyr(threshold, testMin, testMax, preprocessingData):
     
     print("===ACC Decision Tree===")
-    
-    MyNewDataSetTrain_, MyNewDataSetTest_, labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest, labelTrain2, labelTest2, MyNewDataSetTrain2, MyNewDataSetTest2 = preprocessingData
+    labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest = preprocessingData
     
     from sklearn import tree
     X, y = MyNewDataSetTrain, labelTrain
@@ -72,7 +71,6 @@ def trainDecisionTreeModelAllSensors(threshold, testMin, testMax, preprocessingD
     cmd = ['python', '-m', 'onnxruntime.tools.convert_onnx_models_to_ort', 'sklearn_model_dt.onnx']
     shell_cmd = subprocess.run((cmd), capture_output=True, text=True)
     command_output=(shell_cmd.stdout)
-    print(command_output)
     
     so = platform.system()
     if so == "Windows":
@@ -84,11 +82,11 @@ def trainDecisionTreeModelAllSensors(threshold, testMin, testMax, preprocessingD
     print(valueAccuracy)
     return [resultModel,valueAccuracy]
 
-def trainRandomForestModelAllSensors(threshold, testMin, testMax, preprocessingData):
+def trainRandomForestModelAccGyr(threshold, testMin, testMax, preprocessingData):
     
     print("===ACC Random Forest===")
     
-    MyNewDataSetTrain_, MyNewDataSetTest_, labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest, labelTrain2, labelTest2, MyNewDataSetTrain2, MyNewDataSetTest2 = preprocessingData
+    labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest = preprocessingData
     
     from sklearn.ensemble import RandomForestClassifier
     from sklearn import tree
@@ -141,78 +139,138 @@ def trainRandomForestModelAllSensors(threshold, testMin, testMax, preprocessingD
         os.system('mv sklearn_model_rf.onnx saved_model')
         
     return [resultModel,valueAccuracy]
+
+def trainDecisionTreeModelAcc(threshold, testMin, testMax, preprocessingData):
+    
+    print("===ACC Decision Tree===")
+    labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest = preprocessingData
+    
+    from sklearn import tree
+    X, y = MyNewDataSetTrain, labelTrain
+    
+    cont = 0
+    valueAccuracy = 0
+    resultModel = None
+    while cont < testMin or (valueAccuracy < threshold and cont < testMax) :
+        clf = tree.DecisionTreeClassifier()
+        clf = clf.fit(X, y)
+        tree.plot_tree(clf)
+
+        result = []
+        for mndst in  MyNewDataSetTest:
+          result.append(clf.predict([mndst]))
+
+        qtd = 0
+        for i in range(len(labelTest)):
+          if result[i] == labelTest[i]:
+            qtd += 1
+        
+        if valueAccuracy < qtd/len(labelTest):
+            valueAccuracy = qtd/len(labelTest)
+            resultModel = clf
+        cont+=1
+   
+    print(round(valueAccuracy,2))
+    
+    print("==== Deision Tree Model Save ====")
+    # Specify an initial type for the model ( similar to input shape for the model )
+    initial_type = [ 
+        ( 'input_study_hours' , FloatTensorType( [None,1] ) ) 
+    ]
+
+    # Write the ONNX model to disk
+    converted_model = convert_sklearn(resultModel , initial_types=initial_type )
+    with open( "sklearn_model_dt2.onnx", "wb" ) as f:
+        f.write( converted_model.SerializeToString() )
+
+    
+    cmd = ['python', '-m', 'onnxruntime.tools.convert_onnx_models_to_ort', 'sklearn_model_dt2.onnx']
+    shell_cmd = subprocess.run((cmd), capture_output=True, text=True)
+    command_output=(shell_cmd.stdout)
+    
+    so = platform.system()
+    if so == "Windows":
+        os.system('copy sklearn_model_dt2.onnx .\\saved_model\\')
+        os.system('del sklearn_model_dt2.onnx')
+    if so == "Linux":
+        os.system('mv sklearn_model_dt2.onnx saved_model')
+        
+    print(valueAccuracy)
+    return [resultModel,valueAccuracy]
+
+def trainRandomForestModelAcc(threshold, testMin, testMax, preprocessingData):
+    
+    print("===ACC Random Forest===")
+    
+    labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest = preprocessingData
+    
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn import tree
+    X, y = MyNewDataSetTrain, labelTrain
+    
+    cont = 0
+    valueAccuracy = 0
+    resultModel = None
+    while cont < testMin or (valueAccuracy < threshold and cont < testMax):
+        clf = RandomForestClassifier(max_depth=11, random_state=0)
+        clf = clf.fit(X, y)
+
+        result = []
+        for mndst in  MyNewDataSetTest:
+          result.append(clf.predict([mndst]))
+
+        qtd = 0
+        for i in range(len(labelTest)):
+          if result[i] == labelTest[i]:
+            qtd += 1
+            
+        if valueAccuracy < qtd/len(labelTest):
+            valueAccuracy = qtd/len(labelTest)
+            resultModel = clf
+        cont+=1
+    
+    print(round(valueAccuracy,2))
+
+    print("==== Random Forest Model Save ====")
+    # Specify an initial type for the model ( similar to input shape for the model )
+    initial_type = [ 
+        ( 'input_study_hours' , FloatTensorType( [None,1] ) ) 
+    ]
+
+    # Write the ONNX model to disk
+    converted_model = convert_sklearn( resultModel , initial_types=initial_type )
+    with open( "sklearn_model_rf2.onnx", "wb" ) as f:
+        f.write( converted_model.SerializeToString() )
+
+    
+    cmd = ['python', '-m', 'onnxruntime.tools.convert_onnx_models_to_ort', 'sklearn_model_rf2.onnx']
+    shell_cmd = subprocess.run((cmd), capture_output=True, text=True)
+    command_output=(shell_cmd.stdout)
+    
+    so = platform.system()
+    if so == "Windows":
+        os.system('copy sklearn_model_rf2.onnx .\\saved_model\\')
+        os.system('del sklearn_model_rf2.onnx')
+    if so == "Linux":
+        os.system('mv sklearn_model_rf2.onnx saved_model')
+        
+    return [resultModel,valueAccuracy]
     
 if __name__ == '__main__':
-    import DatabasePreprocessing1 as dbp1
+    from Dataset1 import Dataset1
+    from Dataset2 import Dataset2
+    from DatasetACC import DatasetACC
+    from DatasetACC_GYR import DatasetACC_GYR
     print("====Preprocessing====")
-    preprocessingData = dbp1.executePreproccessing()
+    dt1 = Dataset1("Datasets/Dataset1")
+    dt2 = Dataset2("Datasets/D2_ADL_Dataset/HMP_Dataset/All_data")
+    dtACC = DatasetACC([dt1,dt2])
+    dtACCGYR = DatasetACC_GYR([dt1])
+    ppDataACC = dtACC.executePreprocessing()
+    ppDataACCGYR = dtACCGYR.executePreprocessing()
     print("====Training====")
-    trainDecisionTreeModelAllSensors(0.7, 10, 1000, preprocessingData)
-    trainRandomForestModelAllSensors(0.7, 10, 1000, preprocessingData)
-    
-'''
-def trainLinearRegressionAllSensors(limitLR, testMin, testMax, preprocessingData):
-    MyNewDataSetTrain_, MyNewDataSetTest_, labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest, labelTrain2, labelTest2, MyNewDataSetTrain2, MyNewDataSetTest2 = preprocessingData
-
-    #Load a dataset in a Pandas dataframe.
-    #train_df = pd.read_csv("project/train.csv")
-    #test_df = pd.read_csv("project/test.csv")
-
-    train_df = pd.DataFrame(MyNewDataSetTrain_, columns = ["Mean ACC", "MAX ACC", "MIN ACC", "STD ACC", "Kurtosis ACC", "Skewness ACC", "Entropy ACC", "MAD ACC", "IQR ACC","Mean GYR", "MAX GYR", "MIN GYR", "STD GYR", "Kurtosis GYR", "Skewness GYR", "Entropy GYR", "MAD GYR", "IQR GYR", "Movement"])
-    test_df = pd.DataFrame(MyNewDataSetTest_, columns = ["Mean ACC", "MAX ACC", "MIN ACC", "STD ACC", "Kurtosis ACC", "Skewness ACC", "Entropy ACC", "MAD ACC", "IQR ACC","Mean GYR", "MAX GYR", "MIN GYR", "STD GYR", "Kurtosis GYR", "Skewness GYR", "Entropy GYR", "MAD GYR", "IQR GYR", "Movement"])
-
-    from statistics import stdev
-
-    count = 0
-    values = []
-    for a in MyNewDataSetTrain_:
-      if count > 0:
-        value = 0.0 
-        for b in a[0:17]:
-          value+=float(b)
-        values.append([str(value),str(int(a[18]))])
-      else:
-        count+=1
-    dtTrain = np.array(values)
-
-    traindf = pd.DataFrame(dtTrain, columns = ["Values", "Result"])
-
-    count = 0
-    values = []
-    for a in MyNewDataSetTest_:
-      if count > 0:
-        value = 0.0 
-        for b in a[0:17]:
-          value+=float(b)
-        values.append([value,str(int(a[18]))])
-      else:
-        count+=1
-
-    media = 0
-    valores = []
-    for b in values:
-      media += b[0]
-      valores.append(b[0])
-    media = media/len(valores)
-
-    stddev = stdev(valores)
-    for b in values:
-      b[0] = str((b[0] - media)/stddev)
-
-    dtTest = np.array(values)
-
-    testdf = pd.DataFrame(dtTest, columns = ["Values", "Result"])
-
-    from sklearn.linear_model import LinearRegression
-
-
-    X , y = traindf.values[ : , 0 ] , traindf.values[ : , 1 ]
-    X = np.expand_dims( X , axis=1 )
-
-    # Fitting the linear regression model
-    regressor = LinearRegression()
-    regressor.fit( X , y )
-
-    # Make predictions
-    print( f'Prediction for 8.5 hours is {regressor.predict([[12]])[0]}' )
-'''
+    trainDecisionTreeModelAccGyr(0.7, 10, 1000, ppDataACCGYR)
+    trainRandomForestModelAccGyr(0.7, 10, 1000, ppDataACCGYR)
+    trainDecisionTreeModelAcc(0.7, 10, 1000, ppDataACC)
+    trainRandomForestModelAcc(0.7, 10, 1000, ppDataACC)
+   
