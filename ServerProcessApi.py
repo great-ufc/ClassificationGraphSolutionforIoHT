@@ -19,7 +19,7 @@ def get_info(id=None):
     api_url_model_generated = '{0}/UpdateGraphRequest/1'.format(api_url_base)
     api_url_model_generate = '{0}/UpdateGraphRequest/2'.format(api_url_base)
     api_url_optmize = '{0}/OptimizeGraphRequest/acc_gyr'.format(api_url_base)
-    api_url_optmize_with_percentage = '{0}/OptimizeGraphRequest/acc/70'.format(api_url_base)
+    api_url_optmize_with_percentage = '{0}/OptimizeGraphRequest/acc/50'.format(api_url_base)
     api_url = '{0}//api/v1/resources/ngos'.format(api_url_base)
     
     if id == 0:
@@ -152,7 +152,7 @@ def updateGraph():
     addToGraph(dao, valuesList, probability) 
     
     #Add Decision Tree Model related Values with only Accelerometer
-    valuesList = getGraphValues(sensorList, featureList, algorithName2, modelName4, finalStateListACC, DTModelOnlyACC)[1]
+    valuesList = getGraphValues(sensorList2, featureList2, algorithName2, modelName4, finalStateListACC, DTModelOnlyACC)[1]
     probability = valuesList[1]
     valuesList = valuesList[0]
     print(valuesList[1])
@@ -166,7 +166,7 @@ def updateGraph():
     addToGraph(dao, valuesList, probability) 
     
     #Add Random Forest Model related Values with only Accelerometer
-    valuesList = getGraphValues(sensorList, featureList, algorithName3, modelName6, finalStateListACC, RFModelOnlyACC)[1]
+    valuesList = getGraphValues(sensorList2, featureList2, algorithName3, modelName6, finalStateListACC, RFModelOnlyACC)[1]
     probability = valuesList[1]
     valuesList = valuesList[0]
     addToGraph(dao, valuesList, probability) 
