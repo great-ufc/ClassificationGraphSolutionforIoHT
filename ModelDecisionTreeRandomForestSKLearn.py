@@ -76,6 +76,8 @@ def trainDecisionTreeModelAccGyr(threshold, testMin, testMax, preprocessingData)
     if so == "Windows":
         os.system('copy sklearn_model_dt.onnx .\\saved_model\\')
         os.system('del sklearn_model_dt.onnx')
+        os.system('copy sklearn_model_dt.ort .\\saved_model\\')
+        os.system('del sklearn_model_dt.ort')
     if so == "Linux":
         os.system('mv sklearn_model_dt.onnx saved_model')
         
@@ -135,6 +137,8 @@ def trainRandomForestModelAccGyr(threshold, testMin, testMax, preprocessingData)
     if so == "Windows":
         os.system('copy sklearn_model_rf.onnx .\\saved_model\\')
         os.system('del sklearn_model_rf.onnx')
+        os.system('copy sklearn_model_rf.ort .\\saved_model\\')
+        os.system('del sklearn_model_rf.ort')
     if so == "Linux":
         os.system('mv sklearn_model_rf.onnx saved_model')
         
@@ -192,6 +196,8 @@ def trainDecisionTreeModelAcc(threshold, testMin, testMax, preprocessingData):
     if so == "Windows":
         os.system('copy sklearn_model_dt2.onnx .\\saved_model\\')
         os.system('del sklearn_model_dt2.onnx')
+        os.system('copy sklearn_model_dt2.ort .\\saved_model\\')
+        os.system('del sklearn_model_dt2.ort')
     if so == "Linux":
         os.system('mv sklearn_model_dt2.onnx saved_model')
         
@@ -251,6 +257,8 @@ def trainRandomForestModelAcc(threshold, testMin, testMax, preprocessingData):
     if so == "Windows":
         os.system('copy sklearn_model_rf2.onnx .\\saved_model\\')
         os.system('del sklearn_model_rf2.onnx')
+        os.system('copy sklearn_model_rf2.ort .\\saved_model\\')
+        os.system('del sklearn_model_rf2.ort')
     if so == "Linux":
         os.system('mv sklearn_model_rf2.onnx saved_model')
         
