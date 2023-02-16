@@ -12,7 +12,7 @@ To add new Datasets:
 
 # Initilizing steps
 
-Run the following command to run the flask Web API on server port 3000:
+Run the following command to run the flask Web API (app.py) on server port 3000:
  - flask run --host=0.0.0.0 --port=3000 &
 
 Modify the ServerProcessAPI.py file to read the correct endpoint of your web API (e.g., api_url_base = '<_API address_>:3000')
