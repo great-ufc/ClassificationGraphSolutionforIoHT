@@ -67,13 +67,6 @@ def execute(id=None):
 
 
 def updateGraph():
-    from DBConnection import DBConnection
-    from DBInitialize import DBInitialize
-    from Dao import DAO
-    from addVerticeEdgeLists import addSensorList, addFeatureList, addMLModelList, addFinalStateList, addMLAlgorithmList
-    from addVerticeEdgeLists import addSensorFeatureList, addFeatureMLModel, addMLModelFinalState
-    from Entities import Sensor, Feature, MLModel, FinalState, MLAlgorithm
-    from XMLCreate import xml_create
     from ModelANNTensorflow import trainModelWithACCGYR, trainModelWithOnlyACC
     from ModelDecisionTreeRandomForestSKLearn import trainDecisionTreeModelAccGyr, trainRandomForestModelAccGyr, trainDecisionTreeModelAcc, trainRandomForestModelAcc
     from graphFunctions import addToGraph, getGraphValues, optimizeGraph
@@ -81,10 +74,6 @@ def updateGraph():
     from Dataset2 import Dataset2
     from DatasetACC import DatasetACC
     from DatasetACC_GYR import DatasetACC_GYR
-
-    so = platform.system()
-    db = DBInitialize()
-    dao = DAO(db.connection_db)
 
     print("=========Initialize Graph Generate Data from Databases===========")
 
@@ -173,6 +162,7 @@ def updateGraph():
     
     print("\n=================\n")
 
+def graphXMLGenerate(sensorslist, percentage):
     #for i in range(2,50):
     #    dao.delete("SensorFeature",i)
     edges = dao.includeEdgeList()
@@ -180,14 +170,37 @@ def updateGraph():
     edgeFeatureModels = edges[1] 
     edgeModelFinalStates = edges[2]
     xml_create(edgeSensorFeatures, edgeFeatureModels, edgeModelFinalStates)
+    
+    sensors = sensorslist.split("_")
+    graphOptimized = gF.optimizeGraph(dao,sensors,int(percentage)/100)
+    edgeSensorFeaturesO = graphOptimized[0]
+    edgeFeatureModelsO = graphOptimized[1] 
+    edgeModelFinalStatesO = graphOptimized[2]
+    print("teste2")
+    xml_create(edgeSensorFeaturesO, edgeFeatureModelsO, edgeModelFinalStatesO, "KnowledgeBaseOptimized2")
 
 #====Teste====
 #execute()
 if __name__ == "__main__":
+    from DBConnection import DBConnection
+    from DBInitialize import DBInitialize
+    from Dao import DAO
+    from addVerticeEdgeLists import addSensorList, addFeatureList, addMLModelList, addFinalStateList, addMLAlgorithmList
+    from addVerticeEdgeLists import addSensorFeatureList, addFeatureMLModel, addMLModelFinalState
+    from Entities import Sensor, Feature, MLModel, FinalState, MLAlgorithm
+    from XMLCreate import xml_create
+    import graphFunctions as gF
+    
     #execute(2) #UpdateGraphRequest
     #execute(0) #UpdateGraphRequest Execute
+    
+    so = platform.system()
+    db = DBInitialize()
+    dao = DAO(db.connection_db)
+    
     ##OptimizeGraphRequest
-    updateGraph()
+    #updateGraph()
+    graphXMLGenerate("acc_gyr", 50)
     file = open("download.xml", "w")
     file.write(get_info(3))
     file.close()

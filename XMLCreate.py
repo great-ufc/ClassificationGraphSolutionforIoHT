@@ -5,21 +5,22 @@ from bs4 import BeautifulSoup
 
 
 def xml_create(edgeSensorFeature, edgeFeaturesModel, edgeModelsFinalStatus, fileName = "KnowledgeBase"):
+    print(fileName)
     #====================Arquivo===============
     feedFileName = fileName
-    path = "download"
+    path = "download2"
     feedFile = path+"\\"+feedFileName+".xml"
-
+    print(feedFile)
     #====================Montar XML============
     ##====================Cabeçalho===============
-    xml = '<com.example.myappkotlin.model.entities.KnowledgeRepresentation>\n'
+    xml = '<KnowledgeRepresentation>\n'
     
     ##===================Itens================
     ##===================edgeSensorFeature=============
     xml= xml +  '<edgeSensorFeature>\n'
     for esf in edgeSensorFeature:
         #Inicio item
-        xml= xml +  '<com.example.myappkotlin.model.entities.EdgeSensorFeature>\n'
+        xml= xml +  '<EdgeSensorFeature>\n'
         #Sensor
         xml= xml +  '<vSensor>\n'
         xml= xml +  '<typeSensor>'+esf.Sensor.typeSensor.upper()+'</typeSensor>\n'
@@ -33,14 +34,14 @@ def xml_create(edgeSensorFeature, edgeFeaturesModel, edgeModelsFinalStatus, file
         xml= xml +  '</featureName>\n'
         xml= xml +  '</vFeature>\n'
         #Fim item
-        xml= xml +  '</com.example.myappkotlin.model.entities.EdgeSensorFeature>\n'
+        xml= xml +  '</EdgeSensorFeature>\n'
     xml= xml +  '</edgeSensorFeature>\n'
     
     ##===================edgeFeaturesModel=============
     xml= xml +  '<edgeFeaturesModel>\n'
     for efm in edgeFeaturesModel:
         #Inicio item
-        xml= xml +  '<com.example.myappkotlin.model.entities.EdgeFeatureModel>\n'
+        xml= xml +  '<EdgeFeatureModel>\n'
         #Feature
         xml= xml +  '<vFeature>\n'
         xml= xml +  '<feature></feature>\n'
@@ -56,14 +57,14 @@ def xml_create(edgeSensorFeature, edgeFeaturesModel, edgeModelsFinalStatus, file
         xml= xml +  '<outFeature>'+str(efm.MLModel.numOutFeature)+'</outFeature>\n'
         xml= xml +  '</vModel>\n'
         #Fim item
-        xml= xml +  '</com.example.myappkotlin.model.entities.EdgeFeatureModel>\n'
+        xml= xml +  '</EdgeFeatureModel>\n'
     xml= xml +  '</edgeFeaturesModel>\n'
     
     ##===================edgeModelsFinalStatus=============
     xml= xml +  '<edgeModelsFinalStatus>\n'
     for emf in edgeModelsFinalStatus:
         #Inicio item
-        xml= xml +  '<com.example.myappkotlin.model.entities.EdgeModelsFinalStatus>\n'
+        xml= xml +  '<EdgeModelsFinalStatus>\n'
         #Model
         xml= xml +  '<vModel>\n'
         xml= xml +  '<inFeature>'+str(emf.MLModel.numInFeature)+'</inFeature>\n'
@@ -77,11 +78,11 @@ def xml_create(edgeSensorFeature, edgeFeaturesModel, edgeModelsFinalStatus, file
         #Probabilitys
         xml= xml +  '<probability>'+str(emf.probability)+'</probability>\n'
         #Fim item
-        xml= xml +  '</com.example.myappkotlin.model.entities.EdgeModelsFinalStatus>\n'
+        xml= xml +  '</EdgeModelsFinalStatus>\n'
     xml= xml +  '</edgeModelsFinalStatus>\n'
     
     ##===============Fechamento===============
-    xml = xml + '</com.example.myappkotlin.model.entities.KnowledgeRepresentation>'
+    xml = xml + '</KnowledgeRepresentation>'
 
 
     #====================Gravar XML============
