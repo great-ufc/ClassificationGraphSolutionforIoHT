@@ -10,8 +10,7 @@ db_name = None
 #Connection configurations
 host_name = 'localhost' 
 user_name = 'root'
-pw = cesarDecriptor('MqmqtqB3:28',2) #aws
-pw = cesarDecriptor('mqmqtq2C',2) #my pc
+pw = cesarDecriptor('itgcv2C',2) #my pc
 
 #create connection
 def create_server_connection(host_name, user_name, user_password):
