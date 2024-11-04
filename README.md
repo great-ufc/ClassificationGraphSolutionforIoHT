@@ -10,6 +10,13 @@ To add new Datasets:
  - Create code for preprocessing following the pattern of Dataset*.py files and Dataset*<sensors>.py files
  - Modify the updateGraph() ServerProcessAPI.py method to use preprocessing data from the added dataset
 
+# Dependencies for local execution
+- Python 3
+- MySQL Server
+- Flask
+- TensorFLow 2.0
+- Scikit Learn
+
 # Initilizing steps
 
 Run the following command to run the flask Web API (app.py) on server port 3000:
