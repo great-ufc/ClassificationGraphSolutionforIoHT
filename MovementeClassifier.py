@@ -25,7 +25,7 @@ class MovementClassifier:
                     datasets.append(Dataset2(path))
 
             feature_extractor = DatasetACC(datasets)
-            labelTrain, _, X_train, _ = feature_extractor.executePreprocessing()
+            label_train, _, x_train, _ = feature_extractor.executePreprocessing()
             self.class_names = DatasetACC.returnFinalStates()
 
         elif self.sensor_type == 'acc_gyr':
@@ -34,14 +34,14 @@ class MovementClassifier:
 
             datasets = [Dataset1(path) for path in dataset_paths if 'Dataset1' in path]
             feature_extractor = DatasetACC_GYR(datasets)
-            labelTrain, _, X_train, _ = feature_extractor.executePreprocessing()
+            label_train, _, x_train, _ = feature_extractor.executePreprocessing()
             self.class_names = DatasetACC_GYR.returnFinalStates()
 
         self.model = make_pipeline(
             StandardScaler(),
             SVC(kernel='rbf', C=1.0, gamma='scale', probability=True)
         )
-        self.model.fit(X_train, labelTrain)
+        self.model.fit(x_train, label_train)
 
     def _extract_features_from_file(self, file_path):
         from Dataset1 import Dataset1
@@ -92,13 +92,13 @@ class MovementClassifier:
 
 
         if self.sensor_type == 'acc':
-            X_test = np.array([features[:-1]])
+            x_test = np.array([features[:-1]])
         else:
-            X_test = np.array([features[:-1]])
+            x_test = np.array([features[:-1]])
 
         # Predict
-        pred = self.model.predict(X_test)
-        proba = self.model.predict_proba(X_test)
+        pred = self.model.predict(x_test)
+        proba = self.model.predict_proba(x_test)
 
         return self.class_names[pred[0]], np.max(proba)
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
         test_file = "teste1.txt"
         movement, confidence = classifier.predict_movement(test_file)
-        print(f"Predicted movement: {movement} (confidence: {confidence:.2%})")
+        print("Predicted movement: {} (confidence: {:.2%})".format(movement, confidence))
 
     except Exception as e:
-        print(f"Error: {e}")
+        print("Error:", e)
