@@ -6,9 +6,20 @@ Solution to create a Classification Graph using Cloud  for Internet of Health Ap
 Download this full repository
 
 To add new Datasets:
+ - Open Server directory
+ - Open Datasets directory
+ - Open Source directory
+ - Open Datasets directory
  - Add the new Dataset in the Datasets directory
+ - Back two directoris for Datasets directory
+ - Open DatasetManipulation directory
+ - Open Format directory
  - Create code for preprocessing following the pattern of Dataset*.py files and Dataset*<sensors>.py files
- - Modify the updateGraph() ServerProcessAPI.py method to use preprocessing data from the added dataset
+ - Optional: Case need add new sensors or sesnsor combinations
+ - - Back for DatasetManipulation directory
+   - Open Preprocessing directory
+   - Create new preprocessing code file for new sensor compbination with same out signature of both other preprocessing code files in this directory
+ - Finaly Modify the MainFunctions.py to join the informations for new Dataset to the building graph instrunctions in this code file 
 
 # Dependencies for local execution
 - Python 3
@@ -16,6 +27,7 @@ To add new Datasets:
 - Flask
 - TensorFLow 2.0
 - Scikit Learn
+- Numpy 1.*  - Because Tensorflow
 
 # Initilizing steps
 
