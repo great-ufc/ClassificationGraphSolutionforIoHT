@@ -1,16 +1,16 @@
 from mysql import connector
 from mysql.connector import Error
 import pandas as pd
-from . import utils
+from Utilitarios import utils, Constants
 
 connection = None
 connection_db = None
 db_name = None
 
 #Connection configurations
-host_name = 'localhost' 
-user_name = 'root'
-pw = utils.cesarDecriptor('ososvs4E',4) #my pc
+host_name = Constants.host_name 
+user_name = Constants.user_name
+pw = utils.cesarDecriptor(Constants.db_password,Constants.db_password_verificator) #my pc
 
 #create connection
 def create_server_connection(host_name, user_name, user_password):

@@ -158,14 +158,3 @@ class DatasetACC(DatasetSensorType.DatasetSensorType):
         
         return labelTrain, labelTest, MyNewDataSetTrain, MyNewDataSetTest
         
-
-if __name__ == "__main__":
-    from Dataset1 import Dataset1
-    from Dataset2 import Dataset2
-    dt1 = Dataset1("Datasets/Dataset1")
-    dt2 = Dataset2("Datasets/D2_ADL_Dataset/HMP_Dataset/All_data")
-    dtACC = DatasetACC([dt1,dt2])
-    preprocessingData = dtACC.executePreprocessing()
-    print(preprocessingData[2])
-    
-    

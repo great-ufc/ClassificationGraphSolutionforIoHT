@@ -1,14 +1,15 @@
 import shutil
 import sys
 import os
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup
+from Utilitarios import Constants 
 
 
 def xml_create(edgeSensorFeature, edgeFeaturesModel, edgeModelsFinalStatus, fileName = "KnowledgeBase"):
     print(fileName)
     #====================Arquivo===============
     feedFileName = fileName
-    path = "C:\\Users\\junio\\Documents\\Pibic20252026\\Artigo\\Codes\\Graph\\ClassificationGraphSolutionforIoHT\\download"
+    path = Constants.pathProjectDownloads
     feedFile = path+"\\"+feedFileName+".xml"
     print(feedFile)
     #====================Montar XML============

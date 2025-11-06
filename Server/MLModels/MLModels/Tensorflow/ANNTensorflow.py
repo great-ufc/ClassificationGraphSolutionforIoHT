@@ -1,4 +1,5 @@
 import os
+from Utilitarios import Constants
 
 '''trainModelsFunctions'''
 
@@ -43,7 +44,7 @@ def trainModelWithOnlyACC(threshold, numMin, numMax,preprocessingData):
     print('Test accuracy:', test_acc)
 
     """**Export Model**"""
-    pathModel = "C:\\Users\\junio\\Documents\\Pibic20252026\\Artigo\\Codes\\Graph\\ClassificationGraphSolutionforIoHT\\Server\\MLModels\\saved_models\\ANN\\"
+    pathModel = Constants.pathProjectSaveModels+ "\\ANN\\"
     saved_model = pathModel +'LastANNModelACC'
     resultModel.export(saved_model)
 
@@ -129,7 +130,7 @@ def trainModelWithACCGYR(threshold, numMin, numMax,preprocessingData):
 
     """**Export Model**"""
 
-    pathModel = "C:\\Users\\junio\\Documents\\Pibic20252026\\Artigo\\Codes\\Graph\\ClassificationGraphSolutionforIoHT\\Server\\MLModels\\saved_models\\ANN\\"
+    pathModel = Constants.pathProjectSaveModels+ "\\ANN\\"
     saved_model = pathModel +'LastANNModelALL'
     resultModel.export(saved_model)
     """**Generate Model Trained File**"""
@@ -187,45 +188,3 @@ def get_number():
         return int(num)
     else:
       print("Try again...")
-
-if __name__ == '__main__':
-    from Dataset1 import Dataset1
-    from Dataset2 import Dataset2
-    from DatasetACC import DatasetACC
-    from DatasetACC_GYR import DatasetACC_GYR
-    print("====Preprocessing====")
-    dt1 = Dataset1("Datasets/Dataset1")
-    dt2 = Dataset2("Datasets/D2_ADL_Dataset/HMP_Dataset/All_data")
-    dtACC = DatasetACC([dt1,dt2])
-    dtACCGYR = DatasetACC_GYR([dt1])
-    ppDataACC = dtACC.executePreprocessing()
-    ppDataACCGYR = dtACCGYR.executePreprocessing()
-    print("====Training====")
-    modelGenerated2 = trainModelWithOnlyACC(0.7, 1, 10, ppDataACC)
-    modelGenerated = trainModelWithACCGYR(0.7, 1, 10, ppDataACCGYR)
-    
-
-    print("=========Initialize Graph Generate Data===========")
-    algorithName = ["Artificial Neural Network"]
-    modelName = ["ANNModel.tflite"]
-    sensorList = [["acc", "accelerometer"], ["gyr","gyroscope"]]
-    featureList = ["acc_mean", "acc_max", "acc_min", "acc_std", "acc_kurtosis", "acc_skewness", "acc_entropy", "acc_mad", "acc_iqr","gyr_mean", "gyr_max", "gyr_min", "gyr_std", "gyr_kurtosis", "gyr_skewness", "gyr_entropy", "gyr_mad", "gyr_iqr"]
-    modelName2 = ["ANNModel2.tflite"]
-    sensorList2 = [["acc", "accelerometer"]]
-    featureList2 = ["acc_mean", "acc_max", "acc_min", "acc_std", "acc_kurtosis", "acc_skewness", "acc_entropy", "acc_mad", "acc_iqr"]
-    finalStateList = ['Andar', 'BATER_NA_MESA', 'BATER_PAREDE', 'CORRENDO', 'DEITAR','ESBARRAR_PAREDE', 'ESCREVER', 'PALMAS_EMP', 'PALMAS_SEN', 'PULO','QUEDA_APOIO_FRENTE', 'QUEDA_LATERAL', 'QUEDA_SAPOIO_FRENTE', 'SENTAR', 'SENTAR_APOIO', 'SENTAR_SAPOIO', 'TATEAR']
-
-
-    print("=========Predict===========")
-    labelTrain = ppDataACC[0]
-    labelTest = ppDataACC[1]
-    MyNewDataSetTrain = ppDataACC[2]
-    MyNewDataSetTest = ppDataACC[3]
-    
-    while True:
-        num = get_number()
-        if num > 37:
-            break 
-        classes = MyNewDataSetTest[num]
-        label = labelTest[num]
-        predict(modelGenerated2[0], classes, label)

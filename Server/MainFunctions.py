@@ -6,7 +6,9 @@ from DAO.addVerticeEdgeLists import addSensorFeatureList, addFeatureMLModel, add
 from DAO.Entities import Sensor, Feature, MLModel, FinalState, MLAlgorithm
 from XMLCreate import xml_create
 from MLModels.MLModels.Tensorflow.ANNTensorflow import trainModelWithACCGYR, trainModelWithOnlyACC
-from MLModels.MLModels.SkLearn.ModelDecisionTreeRandomForestSKLearn import trainDecisionTreeModelAccGyr, trainRandomForestModelAccGyr, trainDecisionTreeModelAcc, trainRandomForestModelAcc
+from MLModels.MLModels.SkLearn.DecisionTreeSkLearn import trainDecisionTreeModelAccGyr, trainDecisionTreeModelAcc
+from MLModels.MLModels.SkLearn.RandomForestSKLearn import trainRandomForestModelAccGyr, trainRandomForestModelAcc
+from MLModels.MLModels.SkLearn.SVMSKLearn import ModelTrainer
 from graphFunctions import addToGraph, getGraphValues, optimizeGraph
 from Datasets.DatasetManipulation.Preprocessing.DatasetACC_GYR import DatasetACC_GYR
 from Datasets.DatasetManipulation.Preprocessing.DatasetACC import DatasetACC
@@ -19,7 +21,7 @@ import time
 from Utilitarios import Constants
 pathBase = Constants.pathBase
 
-pathDataset = "C:\\Users\\junio\\Documents\\Pibic20252026\\Artigo\\Codes\\Graph\\ClassificationGraphSolutionforIoHT\\Server\\Datasets\\Source\\Datasets" + "\\"  
+pathDataset = "C:\\Users\\junio\\Documents\\Pibic20252026\\Artigo\\Codes\\Graph\\ClassificationGraphSolutionforIoHT\\Server\\Datasets\\Source" + "\\"  
 
 print("\n=======Verifica se já existe banco de dados e tabelas e cria conexão==========\n")
 
@@ -43,6 +45,10 @@ algorithName3 = ["Random Forest"]
 modelName5 = ["sklearn_model_rf.onnx"]
 modelName6 = ["sklearn_model_rf2.onnx"]
 
+algorithName4 = ["Support Vector Machines"]
+modelName7 = ["acc_model.joblib"]
+modelName8 = ["acc_gyr_model.joblib"]
+
 sensorList = [["acc", "accelerometer"], ["gyr","gyroscope"]]
 featureList = ["acc_mean", "acc_max", "acc_min", "acc_std", "acc_kurtosis", "acc_skewness", "acc_entropy", "acc_mad", "acc_iqr","gyr_mean", "gyr_max", "gyr_min", "gyr_std", "gyr_kurtosis", "gyr_skewness", "gyr_entropy", "gyr_mad", "gyr_iqr"]
 
@@ -55,6 +61,7 @@ finalStateListACCGYR = ['Walk', 'Hitting on a table', 'Hitting a wall', 'Running
 
 dt1 = Dataset1(pathDataset+"\\Dataset1")
 dt2 = Dataset2(pathDataset+"\\D2_ADL_Dataset\\HMP_Dataset\\All_data")
+
 
 print("=========begin preprocessing===========")
 start_time = time.perf_counter()
@@ -70,21 +77,26 @@ print("=========end preprocessing=========")
 print("=========trainning===========")
 start_time = time.perf_counter()
 
-print("=========ANN ALL===========")
+print("=========ANN ACC and GYR===========")
 ANNModelACCGYR = trainModelWithACCGYR(0.7, 1, 2, preprocessingData)
 print("=========ANN ACC===========")
 ANNModelOnlyACC = trainModelWithOnlyACC(0.7, 1, 2, preprocessingDataACC)
 
-print("=========Decision Tree ALL===========")
+print("=========Decision Tree ACC and GYR===========")
 DTModelAllACCGYR = trainDecisionTreeModelAccGyr(0.75, 1, 2, preprocessingData)
 print("=========Decision Tree ACC===========")
 DTModelOnlyACC = trainDecisionTreeModelAcc(0.8, 1, 2, preprocessingDataACC)
 
-print("=========Random Forest ALL===========")
+print("=========Random Forest ACC and GYR===========")
 RFModelAllACCGYR = trainRandomForestModelAccGyr(0.75, 1, 2, preprocessingData)
 print("=========Random Forest ACC===========")
 RFModelOnlyACC = trainRandomForestModelAcc(0.8, 1, 2, preprocessingDataACC)
 
+print("=========SVM ACC and GYR===========")
+modelTrainer = ModelTrainer()
+SVMMODELACCGYR = modelTrainer.train_modelACCGYR(0.7,1,2,preprocessingData,finalStateListACCGYR)
+print("=========SVM ACC ===========")
+SVMMODELACC = modelTrainer.train_modelACC(0.7,1,2,preprocessingData,finalStateListACC)
 
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
@@ -131,6 +143,18 @@ addToGraph(dao, valuesList, probability)
 
 #Add Random Forest Model related Values with only Accelerometer
 valuesList = getGraphValues(sensorList2, featureList2, algorithName3, modelName6, finalStateListACC, RFModelOnlyACC)[1]
+probability = valuesList[1]
+valuesList = valuesList[0]
+addToGraph(dao, valuesList, probability)
+
+#Add SVM related Values with All Sensors
+valuesList = getGraphValues(sensorList, featureList, algorithName4, modelName7, finalStateListACCGYR, SVMMODELACCGYR)[1]
+probability = valuesList[1]
+valuesList = valuesList[0]
+addToGraph(dao, valuesList, probability) 
+
+#Add SVM related Values with only Accelerometer
+valuesList = getGraphValues(sensorList2, featureList2, algorithName4, modelName8, finalStateListACC, SVMMODELACC)[1]
 probability = valuesList[1]
 valuesList = valuesList[0]
 addToGraph(dao, valuesList, probability) 
