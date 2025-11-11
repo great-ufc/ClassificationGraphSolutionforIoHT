@@ -6,6 +6,8 @@ pathDownloads = "\\download"
 pathProjectDownloads = projectPath + pathDownloads
 pathSaveModels = "\\Server\\MLModels\\saved_models"
 pathProjectSaveModels = projectPath + pathSaveModels
+graphName = "KnowledgeBase"
+graphOptimizedName = "KnowledgeBaseOptimized"
 
 #Database Connection Information
 host_name = 'localhost' 
